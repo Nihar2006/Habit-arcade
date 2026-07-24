@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "name": "levelup-life-frontend",
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
