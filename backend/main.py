@@ -1,10 +1,11 @@
-<<<<<<< HEAD
+import os
 from datetime import date, datetime, timedelta
 from typing import List, Optional
 from fastapi import FastAPI, Depends, HTTPException, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import func, or_
+import uvicorn
 
 from database import engine, Base, get_db
 from models import User, Habit, HabitLog
@@ -37,19 +38,12 @@ app = FastAPI(
     version="2.0.0"
 )
 
-# Configure CORS Middleware
-origins = [
-    "http://localhost",
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "http://localhost:8000",
-    "http://127.0.0.1",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:5500",
-    "http://127.0.0.1:8000",
-    "*"  # Allows all origins for local dev and decoupled production build
-]
+# Configure CORS Middleware dynamically from env or default to wildcard
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "*")
+if allowed_origins_env == "*":
+    origins = ["*"]
+else:
+    origins = [origin.strip() for origin in allowed_origins_env.split(",") if origin.strip()]
 
 app.add_middleware(
     CORSMiddleware,
@@ -93,6 +87,17 @@ def update_user_level(user: User):
     user.level = max(1, (user.total_xp // 100) + 1)
 
 
+# HEALTH CHECK ENDPOINTS (FOR RENDER / DEPLOYMENT MONITORS)
+@app.get("/")
+@app.get("/api/health")
+def health_check():
+    return {
+        "status": "ok",
+        "app": "LevelUpLife API",
+        "version": "2.0.0"
+    }
+
+
 # AUTH ENDPOINTS
 @app.post("/api/auth/signup", response_model=TokenResponse)
 def signup(req: SignupRequest, db: Session = Depends(get_db)):
@@ -125,149 +130,11 @@ def signup(req: SignupRequest, db: Session = Depends(get_db)):
         coins=100,  # Welcome bonus
         total_xp=0,
         level=1
-=======
-"""
-main.py
--------
-Retro Arcade-Style Personal Routine & Habit Tracker — FastAPI backend.
-
-Run it with either:
-    uvicorn main:app --reload
-or:
-    python main.py
-
-Then open http://127.0.0.1:8000
-"""
-
-import os
-from datetime import datetime
-from pathlib import Path
-
-from fastapi import Depends, FastAPI, Form, HTTPException, Request, status
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from passlib.context import CryptContext
-from sqlalchemy import or_
-from sqlalchemy.orm import Session
-from starlette.middleware.sessions import SessionMiddleware
-
-import crud
-from database import Base, engine, get_db
-from models import User
-from schemas import HabitCreate, HabitUpdate, LogAction
-
-# Create all tables on startup (SQLite file is created automatically if missing).
-Base.metadata.create_all(bind=engine)
-
-app = FastAPI(title="Retro Arcade Habit Tracker")
-app.add_middleware(
-    SessionMiddleware,
-    secret_key=os.getenv("SESSION_SECRET_KEY", os.getenv("SECRET_KEY", "dev-secret-key-change-me-to-a-long-random-string")),
-    https_only=False,
-)
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-# Resolve asset directories relative to this file so the app works
-# when started from the repo root or another CWD.
-BASE_DIR = Path(__file__).resolve().parent
-app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
-templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
-
-
-def get_current_user(request: Request, db: Session = Depends(get_db)) -> User:
-    user_id = request.session.get("user_id")
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Authentication required")
-
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        request.session.pop("user_id", None)
-        raise HTTPException(status_code=401, detail="Authentication required")
-    return user
-
-
-def redirect_to_login(request: Request, error: str | None = None):
-    message = error or request.query_params.get("error", "Authentication required")
-    encoded_message = message.replace(" ", "+")
-    return RedirectResponse(url=f"/login?error={encoded_message}", status_code=303)
-
-
-def is_json_request(request: Request) -> bool:
-    accept_header = request.headers.get("accept", "")
-    if not accept_header:
-        return True
-
-    accept = accept_header.lower()
-    if "application/json" in accept:
-        return True
-    if "text/html" in accept or "application/xhtml+xml" in accept:
-        return False
-    if "*/*" in accept:
-        return False
-    return False
-
-
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    return JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content={"ok": False, "detail": exc.errors()})
-
-
-@app.exception_handler(HTTPException)
-async def http_exception_handler(request: Request, exc: HTTPException):
-    return JSONResponse(status_code=exc.status_code, content={"ok": False, "detail": exc.detail})
-
-
-# ---------------------------------------------------------------------------
-# Auth routes
-# ---------------------------------------------------------------------------
-
-@app.get("/api/signup")
-def signup_get_redirect(request: Request):
-    return RedirectResponse(url="/login", status_code=303)
-
-
-@app.post("/api/signup")
-def signup(
-    request: Request,
-    username: str = Form(...),
-    email: str = Form(...),
-    password: str = Form(...),
-    db: Session = Depends(get_db),
-):
-    normalized_username = username.strip().lower()
-    normalized_email = email.strip().lower()
-    if not normalized_username or not normalized_email or not password:
-        if is_json_request(request):
-            return JSONResponse(status_code=400, content={"ok": False, "detail": "username, email, and password are required"})
-        return redirect_to_login(request, error="username, email, and password are required")
-
-    existing_user = (
-        db.query(User)
-        .filter(or_(User.username == normalized_username, User.email == normalized_email))
-        .first()
-    )
-    if existing_user:
-        if is_json_request(request):
-            return JSONResponse(status_code=409, content={"ok": False, "detail": "username or email already registered"})
-        return redirect_to_login(request, error="username or email already registered")
-
-    user = User(
-        username=normalized_username,
-        email=normalized_email,
-        password_hash=pwd_context.hash(password),
-        xp=0,
-        level=1,
-        coins=100,
->>>>>>> 506a17743a288bb23a716cf93d4e6e6edcd8f4f7
     )
     db.add(user)
     db.commit()
     db.refresh(user)
 
-<<<<<<< HEAD
     access_token = create_access_token(data={"sub": str(user.id)})
     return TokenResponse(
         access_token=access_token,
@@ -651,232 +518,8 @@ def get_day_stats(date_str: str, current_user: User = Depends(get_current_user),
         completion_rate=rate,
         habits=habits_resp
     )
-=======
-    request.session["user_id"] = user.id
-    if is_json_request(request):
-        return JSONResponse(status_code=200, content={"ok": True, "user": {"id": user.id, "username": user.username}})
-    return RedirectResponse(url="/", status_code=303)
-
-
-@app.post("/api/login")
-def login(
-    request: Request,
-    email: str = Form(...),
-    password: str = Form(...),
-    db: Session = Depends(get_db),
-):
-    normalized_email = email.strip().lower()
-    user = db.query(User).filter(User.email == normalized_email).first()
-    if not user or not pwd_context.verify(password, user.password_hash):
-        if is_json_request(request) or request.headers.get("x-requested-with", "").lower() == "xmlhttprequest":
-            return JSONResponse(status_code=401, content={"ok": False, "detail": "invalid credentials"})
-        return redirect_to_login(request, error="Invalid Credentials")
-
-    request.session["user_id"] = user.id
-    if is_json_request(request) or request.headers.get("x-requested-with", "").lower() == "xmlhttprequest":
-        return JSONResponse(status_code=200, content={"ok": True, "user": {"id": user.id, "username": user.username}})
-    return RedirectResponse(url="/", status_code=303)
-
-
-@app.get("/login", response_class=HTMLResponse)
-def login_page(request: Request, error: str | None = None):
-    return templates.TemplateResponse(
-        request,
-        "login.html",
-        {"error": error.replace("+", " ").replace("%20", " ") if error else None},
-    )
-
-
-@app.get("/logout")
-def logout(request: Request):
-    request.session.clear()
-    return RedirectResponse(url="/login", status_code=303)
-
-
-# ---------------------------------------------------------------------------
-# Page route
-# ---------------------------------------------------------------------------
-
-@app.get("/", response_class=HTMLResponse)
-def dashboard(
-    request: Request,
-    db: Session = Depends(get_db),
-):
-    try:
-        current_user = get_current_user(request, db)
-    except HTTPException:
-        return redirect_to_login(request)
-
-    state = crud.get_dashboard_state(db, current_user, days=7)
-    # NOTE: modern Starlette (>=0.36-ish, used by current FastAPI) expects
-    # the Request object as the first positional argument to
-    # TemplateResponse, with the template name second and the extra
-    # context as a plain dict third. The older `TemplateResponse(name,
-    # {"request": request, ...})` call style is deprecated and, on some
-    # versions, actively breaks Jinja2's internal template cache lookup
-    # (raises `TypeError: unhashable type: 'dict'`). Use the new signature.
-    return templates.TemplateResponse(
-        request, "index.html", {"initial_state": state}
-    )
-
-
-# ---------------------------------------------------------------------------
-# Read: full dashboard state (stats, matrix, leaderboard, chart data)
-# ---------------------------------------------------------------------------
-
-@app.get("/api/state")
-def api_state(
-    request: Request,
-    days: int = 7,
-    db: Session = Depends(get_db),
-):
-    try:
-        current_user = get_current_user(request, db)
-    except HTTPException as exc:
-        if is_json_request(request):
-            return JSONResponse(status_code=exc.status_code, content={"ok": False, "detail": exc.detail})
-        return redirect_to_login(request, error=str(exc.detail))
-    days = max(1, min(days, 90))
-    return crud.get_dashboard_state(db, current_user, days=days)
-
-
-# ---------------------------------------------------------------------------
-# Create habit
-# ---------------------------------------------------------------------------
-
-@app.post("/api/habits")
-def api_create_habit(
-    request: Request,
-    payload: HabitCreate,
-    db: Session = Depends(get_db),
-):
-    current_user = get_current_user(request, db)
-    habit = crud.create_habit(
-        db, current_user,
-        title=payload.title,
-        emoji=payload.emoji,
-        goal_target=payload.goal_target,
-        frequency=payload.frequency,
-    )
-    return {"ok": True, "habit_id": habit.id}
-
-
-# ---------------------------------------------------------------------------
-# Update habit (edit details)
-# ---------------------------------------------------------------------------
-
-@app.put("/api/habits/{habit_id}")
-def api_update_habit(
-    request: Request,
-    habit_id: int,
-    payload: HabitUpdate,
-    db: Session = Depends(get_db),
-):
-    current_user = get_current_user(request, db)
-    habit = crud.get_habit(db, habit_id, current_user)
-    if not habit:
-        return JSONResponse(status_code=404, content={"ok": False, "detail": "Habit not found"})
-    crud.update_habit(db, habit, **payload.model_dump(exclude_unset=True))
-    return JSONResponse(status_code=200, content={"ok": True})
-
-
-# ---------------------------------------------------------------------------
-# Delete habit
-# ---------------------------------------------------------------------------
-
-@app.delete("/api/habits/{habit_id}")
-def api_delete_habit(
-    request: Request,
-    habit_id: int,
-    db: Session = Depends(get_db),
-):
-    current_user = get_current_user(request, db)
-    habit = crud.get_habit(db, habit_id, current_user)
-    if not habit:
-        return JSONResponse(status_code=404, content={"ok": False, "detail": "Habit not found"})
-    crud.delete_habit(db, habit)
-    return JSONResponse(status_code=200, content={"ok": True})
-
-
-# ---------------------------------------------------------------------------
-# Toggle / increment / decrement a day's completion
-# ---------------------------------------------------------------------------
-
-@app.post("/api/habits/{habit_id}/log")
-def api_log_action(
-    request: Request,
-    habit_id: int,
-    payload: LogAction,
-    db: Session = Depends(get_db),
-):
-    current_user = get_current_user(request, db)
-    habit = crud.get_habit(db, habit_id, current_user)
-    if not habit:
-        return JSONResponse(status_code=404, content={"ok": False, "detail": "Habit not found"})
-    try:
-        on_date = datetime.strptime(payload.date, "%Y-%m-%d").date()
-    except ValueError:
-        return JSONResponse(status_code=400, content={"ok": False, "detail": "date must be YYYY-MM-DD"})
-
-    if payload.action not in ("toggle", "increment", "decrement"):
-        return JSONResponse(status_code=400, content={"ok": False, "detail": "invalid action"})
-
-    crud.apply_log_action(db, habit, current_user, on_date, payload.action)
-    # Return the freshly recomputed full state so the UI can re-render in one go.
-    return crud.get_dashboard_state(db, current_user, days=7)
-
-
-# ---------------------------------------------------------------------------
-# Revive a broken streak
-# ---------------------------------------------------------------------------
-
-@app.post("/api/habits/{habit_id}/revive")
-def api_revive(
-    request: Request,
-    habit_id: int,
-    db: Session = Depends(get_db),
-):
-    current_user = get_current_user(request, db)
-    habit = crud.get_habit(db, habit_id, current_user)
-    if not habit:
-        return JSONResponse(status_code=404, content={"ok": False, "detail": "Habit not found"})
-    try:
-        crud.revive_streak(db, habit, current_user)
-    except ValueError as exc:
-        return JSONResponse(status_code=400, content={"ok": False, "error": str(exc)})
-    return JSONResponse(status_code=200, content={"ok": True, **crud.get_dashboard_state(db, current_user, days=7)})
-
-# ---------------------------------------------------------------------------
-# Discipline Log: heatmap feed + single-day drill-down
-# ---------------------------------------------------------------------------
-
-@app.get("/api/heatmap")
-def api_heatmap(
-    request: Request,
-    days: int = 365,
-    db: Session = Depends(get_db),
-):
-    current_user = get_current_user(request, db)
-    days = max(30, min(days, 730))
-    return crud.get_heatmap_data(db, current_user, days=days)
-
-
-@app.get("/api/day/{date_str}")
-def api_day_detail(
-    request: Request,
-    date_str: str,
-    db: Session = Depends(get_db),
-):
-    current_user = get_current_user(request, db)
-    try:
-        on_date = datetime.strptime(date_str, "%Y-%m-%d").date()
-    except ValueError:
-        return JSONResponse(status_code=400, content={"ok": False, "detail": "date must be YYYY-MM-DD"})
-    return crud.get_day_detail(db, current_user, on_date)
 
 
 if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
->>>>>>> 506a17743a288bb23a716cf93d4e6e6edcd8f4f7
+    port = int(os.getenv("PORT", 10000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

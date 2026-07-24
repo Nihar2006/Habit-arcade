@@ -1,6 +1,13 @@
-const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-  ? 'http://127.0.0.1:8000/api'
-  : '/api';
+const getApiBaseUrl = () => {
+  if (window.ENV_API_URL) return window.ENV_API_URL.replace(/\/$/, '');
+  if (localStorage.getItem('api_url')) return localStorage.getItem('api_url').replace(/\/$/, '');
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://127.0.0.1:8000/api';
+  }
+  return '/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 class ApiService {
   static getToken() {
