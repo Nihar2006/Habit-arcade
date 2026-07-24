@@ -23,6 +23,17 @@ body.light-mode {
   --pattern-color: #e5d4c0;
 }
 
+/* Global Reset & Responsive Box-Sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   font-family: 'Press Start 2P', cursive, monospace;
   background-color: var(--bg-color);
@@ -33,6 +44,15 @@ body {
   margin: 0;
   padding: 0;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+img, svg, video, canvas, audio, iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+input, select, textarea, button {
+  max-width: 100%;
 }
 
 /* Custom Scrollbar */
@@ -55,6 +75,7 @@ body.light-mode ::-webkit-scrollbar-track {
 .nes-container.is-dark {
   background-color: var(--card-bg) !important;
   border-image-repeat: stretch !important;
+  max-width: 100%;
 }
 
 body.light-mode .nes-container.is-dark {
@@ -118,7 +139,9 @@ body.light-mode .border-gray-700 {
   grid-auto-flow: column;
   gap: 3px;
   overflow-x: auto;
+  max-width: 100%;
   padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .heatmap-cell {
@@ -173,6 +196,8 @@ body.light-mode .text-gold {
 .modal-overlay {
   background-color: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(4px);
+  max-width: 100vw;
+  overflow-y: auto;
 }
 body.light-mode .modal-overlay {
   background-color: rgba(62, 39, 35, 0.7);
@@ -198,4 +223,33 @@ body.light-mode .modal-overlay {
 .floating-coin {
   display: inline-block;
   animation: coinFloat 1.5s infinite ease-in-out;
+}
+
+/* RESPONSIVE MEDIA QUERIES (320px - 768px) */
+@media (max-width: 768px) {
+  .nes-container {
+    padding: 1rem 0.75rem !important;
+  }
+  .nes-container.with-title > .title {
+    font-size: 0.65rem !important;
+  }
+  .modal-overlay > .nes-container {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .nes-container {
+    padding: 0.75rem 0.5rem !important;
+  }
+  .nes-btn {
+    font-size: 9px !important;
+    padding: 4px 6px !important;
+  }
+  .habit-card-actions {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 0.25rem;
+  }
 }

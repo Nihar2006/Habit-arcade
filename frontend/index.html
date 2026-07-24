@@ -1,45 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LevelUpLife — 8-Bit Habit Arcade</title>
+
+  <!-- PWA Manifest & App Icons -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="favicon.ico">
+  <meta name="theme-color" content="#121212">
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- NES.css CDN -->
-  <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet" />
+  <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet">
 
   <!-- Press Start 2P Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="text-white min-h-screen pb-12">
 
   <!-- TOP HEADER / NAV BAR -->
-  <header class="border-b-4 border-yellow-400 bg-gray-900 px-4 py-3 sticky top-0 z-40 shadow-lg">
-    <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-4">
-      <div class="flex items-center gap-3">
-        <i class="nes-icon trophy is-medium"></i>
-        <h1 class="text-xl sm:text-2xl text-gold font-bold tracking-wider">LEVEL UP LIFE</h1>
-        <button id="theme-toggle-btn" class="nes-btn is-warning text-[10px] py-1 px-2 flex items-center gap-1 ml-2" title="Toggle Light / Dark Mode">
+  <header class="border-b-4 border-yellow-400 bg-gray-900 px-3 sm:px-4 py-3 sticky top-0 z-40 shadow-lg">
+    <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-2 sm:gap-4">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <i class="nes-icon trophy is-small sm:is-medium"></i>
+        <h1 class="text-base sm:text-2xl text-gold font-bold tracking-wider">LEVEL UP LIFE</h1>
+        <button id="theme-toggle-btn" class="nes-btn is-warning text-[9px] sm:text-[10px] py-1 px-2 flex items-center gap-1 ml-1 sm:ml-2" title="Toggle Light / Dark Mode">
           <span id="theme-icon">☀️</span> <span id="theme-text">LIGHT</span>
         </button>
       </div>
 
       <!-- User Stats & Profile Header (Shown when logged in) -->
-      <div id="nav-user-bar" class="hidden flex items-center flex-wrap gap-4 text-xs">
-        <div class="flex items-center gap-2 bg-gray-800 px-3 py-1 border-2 border-yellow-500 rounded">
+      <div id="nav-user-bar" class="hidden flex items-center flex-wrap gap-2 sm:gap-4 text-xs">
+        <div class="flex items-center gap-2 bg-gray-800 px-2 sm:px-3 py-1 border-2 border-yellow-500 rounded max-w-full">
           <span class="text-yellow-400">LVL <span id="user-level">1</span></span>
-          <div class="w-24 bg-gray-700 h-3 border border-gray-500 overflow-hidden">
+          <div class="w-16 sm:w-24 bg-gray-700 h-3 border border-gray-500 overflow-hidden">
             <div id="user-xp-bar" class="bg-green-500 h-full w-0 transition-all duration-300"></div>
           </div>
         </div>
 
-        <div class="bg-gray-800 px-3 py-1 border-2 border-yellow-500 rounded flex items-center gap-2">
+        <div class="bg-gray-800 px-2 sm:px-3 py-1 border-2 border-yellow-500 rounded flex items-center gap-2">
           <span class="floating-coin">🪙</span>
           <span id="user-coins" class="text-yellow-300 font-bold">0</span>
         </div>
@@ -53,7 +59,7 @@
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 mt-6">
+  <main class="max-w-6xl mx-auto px-3 sm:px-4 mt-4 sm:mt-6">
 
     <!-- NOTIFICATION ALERT BOX -->
     <div id="toast-container" class="hidden mb-6">
@@ -63,7 +69,7 @@
     </div>
 
     <!-- ==================== AUTH VIEW ==================== -->
-    <section id="auth-view" class="max-w-md mx-auto my-12">
+    <section id="auth-view" class="max-w-md mx-auto my-6 sm:my-12 px-2 sm:px-0">
       <div class="nes-container is-dark with-title nes-card-glow">
         <p class="title text-yellow-400">ARCADE LOGIN</p>
 
@@ -107,39 +113,39 @@
     </section>
 
     <!-- ==================== DASHBOARD VIEW ==================== -->
-    <section id="dashboard-view" class="hidden space-y-8">
+    <section id="dashboard-view" class="hidden space-y-6 sm:space-y-8">
 
       <!-- DASHBOARD SUMMARY CARDS -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
-        <div class="nes-container is-dark p-3 text-center border-yellow-500">
-          <p class="text-gray-400 mb-1">ACTIVE HABITS</p>
-          <p id="stat-total-habits" class="text-xl text-yellow-400 font-bold">0</p>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 text-xs">
+        <div class="nes-container is-dark p-2 sm:p-3 text-center border-yellow-500">
+          <p class="text-gray-400 mb-1 text-[9px] sm:text-xs">ACTIVE HABITS</p>
+          <p id="stat-total-habits" class="text-lg sm:text-xl text-yellow-400 font-bold">0</p>
         </div>
-        <div class="nes-container is-dark p-3 text-center border-green-500">
-          <p class="text-gray-400 mb-1">DONE TODAY</p>
-          <p id="stat-done-today" class="text-xl text-green-400 font-bold">0</p>
+        <div class="nes-container is-dark p-2 sm:p-3 text-center border-green-500">
+          <p class="text-gray-400 mb-1 text-[9px] sm:text-xs">DONE TODAY</p>
+          <p id="stat-done-today" class="text-lg sm:text-xl text-green-400 font-bold">0</p>
         </div>
-        <div class="nes-container is-dark p-3 text-center border-red-500">
-          <p class="text-gray-400 mb-1">BEST STREAK</p>
-          <p id="stat-best-streak" class="text-xl text-red-400 font-bold">0 🔥</p>
+        <div class="nes-container is-dark p-2 sm:p-3 text-center border-red-500">
+          <p class="text-gray-400 mb-1 text-[9px] sm:text-xs">BEST STREAK</p>
+          <p id="stat-best-streak" class="text-lg sm:text-xl text-red-400 font-bold">0 🔥</p>
         </div>
-        <div class="nes-container is-dark p-3 text-center border-blue-500">
-          <p class="text-gray-400 mb-1">TOTAL XP</p>
-          <p id="stat-total-xp" class="text-xl text-blue-400 font-bold">0</p>
+        <div class="nes-container is-dark p-2 sm:p-3 text-center border-blue-500">
+          <p class="text-gray-400 mb-1 text-[9px] sm:text-xs">TOTAL XP</p>
+          <p id="stat-total-xp" class="text-lg sm:text-xl text-blue-400 font-bold">0</p>
         </div>
       </div>
 
       <!-- HABITS CONTROLS BAR -->
-      <div class="nes-container is-dark p-4 flex flex-wrap justify-between items-center gap-4">
+      <div class="nes-container is-dark p-3 sm:p-4 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-4">
         <div class="flex items-center gap-3">
-          <button id="add-habit-btn" class="nes-btn is-success text-xs flex items-center gap-2">
+          <button id="add-habit-btn" class="nes-btn is-success text-xs flex items-center justify-center gap-2 w-full sm:w-auto">
             <span>+</span> NEW HABIT
           </button>
         </div>
 
-        <div class="flex items-center gap-2 text-xs">
-          <span class="text-gray-400">CATEGORY:</span>
-          <div class="nes-select is-dark w-40 text-xs">
+        <div class="flex items-center justify-between sm:justify-end gap-2 text-xs">
+          <span class="text-gray-400 shrink-0">CATEGORY:</span>
+          <div class="nes-select is-dark w-full sm:w-40 text-xs">
             <select id="category-filter">
               <option value="ALL">ALL</option>
               <option value="Health">Health</option>
@@ -177,7 +183,7 @@
         </div>
 
         <!-- Legend -->
-        <div class="flex items-center justify-end gap-2 text-[10px] mt-3 text-gray-400">
+        <div class="flex flex-wrap items-center justify-end gap-2 text-[10px] mt-3 text-gray-400">
           <span>LESS</span>
           <span class="heatmap-cell level-0 inline-block"></span>
           <span class="heatmap-cell level-1 inline-block"></span>
@@ -194,7 +200,7 @@
   <!-- ==================== MODALS ==================== -->
 
   <!-- ADD / EDIT HABIT MODAL -->
-  <div id="habit-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden px-4">
+  <div id="habit-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden px-3 sm:px-4">
     <div class="nes-container is-dark with-title max-w-md w-full">
       <p id="habit-modal-title" class="title text-yellow-400">NEW QUEST</p>
 
@@ -228,7 +234,7 @@
   </div>
 
   <!-- HISTORICAL DAY STATS MODAL -->
-  <div id="date-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden px-4">
+  <div id="date-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden px-3 sm:px-4">
     <div class="nes-container is-dark with-title max-w-lg w-full">
       <p id="date-modal-title" class="title text-yellow-400">DATE STATS</p>
 
@@ -250,20 +256,20 @@
   </div>
 
   <!-- VICTORY / STAGE CLEARED POP-UP MODAL -->
-  <div id="victory-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden px-4">
-    <div class="nes-container is-dark victory-card max-w-md w-full text-center p-6 border-yellow-400">
+  <div id="victory-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden px-3 sm:px-4">
+    <div class="nes-container is-dark victory-card max-w-md w-full text-center p-4 sm:p-6 border-yellow-400">
       <div class="mb-4">
         <i class="nes-icon trophy is-large"></i>
       </div>
-      <h2 class="text-2xl text-yellow-400 font-bold tracking-widest mb-2">STAGE CLEARED!</h2>
+      <h2 class="text-xl sm:text-2xl text-yellow-400 font-bold tracking-widest mb-2">STAGE CLEARED!</h2>
       <p class="text-gray-300 text-xs mb-6">ALL QUESTS COMPLETED FOR TODAY!</p>
 
-      <div class="bg-gray-800 p-4 border-2 border-yellow-500 mb-6 space-y-3 text-xs">
+      <div class="bg-gray-800 p-3 sm:p-4 border-2 border-yellow-500 mb-6 space-y-3 text-xs">
         <p class="text-green-400 font-bold">✨ +50 XP PERFECT BONUS</p>
         <p class="text-yellow-300 font-bold">🪙 +10 EXTRA COINS</p>
       </div>
 
-      <button id="close-victory-modal" class="nes-btn is-warning text-xs px-6 py-2">CONTINUE PLAYING</button>
+      <button id="close-victory-modal" class="nes-btn is-warning text-xs px-4 sm:px-6 py-2">CONTINUE PLAYING</button>
     </div>
   </div>
 

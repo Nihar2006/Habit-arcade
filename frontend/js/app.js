@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (h.current_streak > maxStreak) maxStreak = h.current_streak;
 
       const card = document.createElement('div');
-      card.className = `nes-container is-dark p-4 flex flex-wrap items-center justify-between gap-4 border-2 ${
+      card.className = `nes-container is-dark p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4 border-2 ${
         h.completed_today ? 'border-green-500 bg-gray-900/80' : 'border-gray-700'
       }`;
 
@@ -288,21 +288,21 @@ document.addEventListener('DOMContentLoaded', () => {
       const categoryClass = categoryColors[h.category] || 'is-dark';
 
       card.innerHTML = `
-        <div class="flex items-center gap-3 flex-1 min-w-[200px]">
-          <button class="toggle-btn nes-btn text-xs ${h.completed_today ? 'is-success' : 'is-normal'}" data-id="${h.id}">
+        <div class="flex items-center gap-3 flex-1 min-w-0">
+          <button class="toggle-btn nes-btn text-xs ${h.completed_today ? 'is-success' : 'is-normal'} shrink-0" data-id="${h.id}">
             ${h.completed_today ? '✓ DONE' : 'DO IT'}
           </button>
 
-          <div>
-            <h3 class="text-sm font-bold text-white ${h.completed_today ? 'line-through text-gray-400' : ''}">${escapeHtml(h.title)}</h3>
-            <div class="flex items-center gap-2 mt-1">
+          <div class="min-w-0 flex-1 break-words">
+            <h3 class="text-xs sm:text-sm font-bold text-white break-words ${h.completed_today ? 'line-through text-gray-400' : ''}">${escapeHtml(h.title)}</h3>
+            <div class="flex flex-wrap items-center gap-2 mt-1">
               <span class="nes-badge"><span class="${categoryClass} text-[10px] py-0 px-1">${escapeHtml(h.category)}</span></span>
               <span class="text-[10px] text-red-400 font-bold">🔥 ${h.current_streak} DAY${h.current_streak === 1 ? '' : 'S'}</span>
             </div>
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2 habit-card-actions">
           ${
             !h.completed_today ? `
               <button class="revive-btn nes-btn is-warning text-[10px] py-1 px-2" data-id="${h.id}" title="Spend 20 coins to keep/restore streak">
