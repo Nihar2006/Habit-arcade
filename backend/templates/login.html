@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LevelUpLife | Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              neon: '#7CFFCB',
+              cyber: '#00E5FF',
+              danger: '#FF4D6D',
+              dusk: '#0F172A',
+            },
+            boxShadow: {
+              glow: '0 0 0 2px #7CFFCB, 0 0 18px rgba(124,255,203,0.45)',
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: 'VT323', monospace;
+        background: linear-gradient(135deg, #050816 0%, #111827 45%, #08121f 100%);
+      }
+
+      .pixel-font {
+        font-family: 'Press Start 2P', cursive;
+      }
+
+      .panel-shell {
+        background: rgba(8, 15, 36, 0.92);
+        border: 3px solid #7CFFCB;
+        box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.35), 0 0 35px rgba(0, 229, 255, 0.25);
+      }
+
+      .input-shell {
+        background: rgba(15, 23, 42, 0.95);
+      }
+
+      .retro-divider {
+        border-image: linear-gradient(90deg, transparent, #7CFFCB, transparent) 1;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-slate-100">
+    <main class="mx-auto flex min-h-screen max-w-7xl items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
+      <section class="panel-shell w-full max-w-5xl overflow-hidden rounded-none">
+        <div class="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
+          <div class="border-b border-cyan-400/30 p-6 sm:p-8 lg:border-b-0 lg:border-r lg:p-10">
+            <div class="mb-6 flex items-center gap-3">
+              <span class="nes-logo"></span>
+              <div>
+                <p class="pixel-font text-[0.6rem] tracking-[0.2em] text-cyan-300">LEVELUPLIFE</p>
+                <h1 class="pixel-font text-lg text-neon">BOOT SEQUENCE</h1>
+              </div>
+            </div>
+
+            <div class="mb-6 rounded-none border border-cyan-400/40 bg-slate-900/70 p-4">
+              <p class="pixel-font text-[0.55rem] leading-6 text-cyan-300">
+                ACCESS YOUR HABIT ARCADE
+              </p>
+              <p class="mt-2 text-lg text-slate-100 sm:text-xl">
+                Log in to track your streaks, climb the leaderboard, and hack your daily routine.
+              </p>
+            </div>
+
+            {% if error %}
+            <div class="mb-6 flex items-center gap-3 rounded-none border border-red-400/60 bg-red-500/15 p-3 text-red-200">
+              <span class="text-xl">⚠</span>
+              <span class="pixel-font text-[0.6rem] leading-5">{{ error }}</span>
+            </div>
+            {% endif %}
+
+            <form action="/api/login" method="post" class="space-y-4">
+              <div class="space-y-2">
+                <label class="pixel-font text-[0.55rem] uppercase tracking-[0.25em] text-cyan-300" for="login-email">
+                  Email
+                </label>
+                <input
+                  id="login-email"
+                  name="email"
+                  type="email"
+                  class="input-shell w-full border border-cyan-400/50 px-3 py-3 text-lg outline-none focus:border-neon focus:shadow-glow"
+                  placeholder="player@arcade.dev"
+                  required
+                />
+              </div>
+              <div class="space-y-2">
+                <label class="pixel-font text-[0.55rem] uppercase tracking-[0.25em] text-cyan-300" for="login-password">
+                  Password
+                </label>
+                <input
+                  id="login-password"
+                  name="password"
+                  type="password"
+                  class="input-shell w-full border border-cyan-400/50 px-3 py-3 text-lg outline-none focus:border-neon focus:shadow-glow"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+              <button type="submit" class="nes-btn is-primary mt-2 w-full px-4 py-3 text-sm">
+                PLAYER LOGIN
+              </button>
+            </form>
+          </div>
+
+          <div class="p-6 sm:p-8 lg:p-10">
+            <div class="mb-5">
+              <p class="pixel-font text-[0.55rem] uppercase tracking-[0.25em] text-neon">NEW GAME</p>
+              <h2 class="pixel-font text-lg text-cyan-300">SIGN UP</h2>
+            </div>
+
+            <form action="/api/signup" method="post" class="space-y-4">
+              <div class="space-y-2">
+                <label class="pixel-font text-[0.55rem] uppercase tracking-[0.25em] text-cyan-300" for="signup-username">
+                  Username
+                </label>
+                <input
+                  id="signup-username"
+                  name="username"
+                  type="text"
+                  class="input-shell w-full border border-cyan-400/50 px-3 py-3 text-lg outline-none focus:border-neon focus:shadow-glow"
+                  placeholder="NEW_PLAYER"
+                  required
+                />
+              </div>
+              <div class="space-y-2">
+                <label class="pixel-font text-[0.55rem] uppercase tracking-[0.25em] text-cyan-300" for="signup-email">
+                  Email
+                </label>
+                <input
+                  id="signup-email"
+                  name="email"
+                  type="email"
+                  class="input-shell w-full border border-cyan-400/50 px-3 py-3 text-lg outline-none focus:border-neon focus:shadow-glow"
+                  placeholder="player@arcade.dev"
+                  required
+                />
+              </div>
+              <div class="space-y-2">
+                <label class="pixel-font text-[0.55rem] uppercase tracking-[0.25em] text-cyan-300" for="signup-password">
+                  Password
+                </label>
+                <input
+                  id="signup-password"
+                  name="password"
+                  type="password"
+                  class="input-shell w-full border border-cyan-400/50 px-3 py-3 text-lg outline-none focus:border-neon focus:shadow-glow"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+              <button type="submit" class="nes-btn is-success mt-2 w-full px-4 py-3 text-sm">
+                START NEW RUN
+              </button>
+            </form>
+
+            <div class="retro-divider my-6 border-t"></div>
+            <div class="rounded-none border border-fuchsia-400/40 bg-slate-900/60 p-3 text-sm text-slate-300">
+              <p class="pixel-font text-[0.5rem] uppercase tracking-[0.25em] text-fuchsia-300">BONUS POWER-UP</p>
+              <p class="mt-2">Create an account to save your habits, XP, coins, and streaks across sessions.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

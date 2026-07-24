@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LevelUpLife — 8-Bit Habit Arcade</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- NES.css CDN -->
+  <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet" />
+
+  <!-- Press Start 2P Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="text-white min-h-screen pb-12">
+
+  <!-- TOP HEADER / NAV BAR -->
+  <header class="border-b-4 border-yellow-400 bg-gray-900 px-4 py-3 sticky top-0 z-40 shadow-lg">
+    <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <i class="nes-icon trophy is-medium"></i>
+        <h1 class="text-xl sm:text-2xl text-gold font-bold tracking-wider">LEVEL UP LIFE</h1>
+        <button id="theme-toggle-btn" class="nes-btn is-warning text-[10px] py-1 px-2 flex items-center gap-1 ml-2" title="Toggle Light / Dark Mode">
+          <span id="theme-icon">☀️</span> <span id="theme-text">LIGHT</span>
+        </button>
+      </div>
+
+      <!-- User Stats & Profile Header (Shown when logged in) -->
+      <div id="nav-user-bar" class="hidden flex items-center flex-wrap gap-4 text-xs">
+        <div class="flex items-center gap-2 bg-gray-800 px-3 py-1 border-2 border-yellow-500 rounded">
+          <span class="text-yellow-400">LVL <span id="user-level">1</span></span>
+          <div class="w-24 bg-gray-700 h-3 border border-gray-500 overflow-hidden">
+            <div id="user-xp-bar" class="bg-green-500 h-full w-0 transition-all duration-300"></div>
+          </div>
+        </div>
+
+        <div class="bg-gray-800 px-3 py-1 border-2 border-yellow-500 rounded flex items-center gap-2">
+          <span class="floating-coin">🪙</span>
+          <span id="user-coins" class="text-yellow-300 font-bold">0</span>
+        </div>
+
+        <div class="text-gray-300">
+          <span id="user-name">PLAYER 1</span>
+        </div>
+
+        <button id="logout-btn" class="nes-btn is-error text-xs py-1 px-2">LOGOUT</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 mt-6">
+
+    <!-- NOTIFICATION ALERT BOX -->
+    <div id="toast-container" class="hidden mb-6">
+      <div id="toast-box" class="nes-container is-dark with-title text-xs p-3">
+        <p id="toast-message" class="text-yellow-400"></p>
+      </div>
+    </div>
+
+    <!-- ==================== AUTH VIEW ==================== -->
+    <section id="auth-view" class="max-w-md mx-auto my-12">
+      <div class="nes-container is-dark with-title nes-card-glow">
+        <p class="title text-yellow-400">ARCADE LOGIN</p>
+
+        <!-- Auth Tabs -->
+        <div class="flex border-b border-gray-700 mb-6 text-xs">
+          <button id="tab-login" class="flex-1 py-2 text-center text-yellow-400 border-b-4 border-yellow-400 font-bold">LOGIN</button>
+          <button id="tab-signup" class="flex-1 py-2 text-center text-gray-400 hover:text-white">SIGN UP</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" class="space-y-4 text-xs">
+          <div>
+            <label class="block mb-2 text-gray-300">USERNAME OR EMAIL</label>
+            <input type="text" id="login-username" class="nes-input is-dark text-xs w-full" required placeholder="player1" />
+          </div>
+          <div>
+            <label class="block mb-2 text-gray-300">PASSWORD</label>
+            <input type="password" id="login-password" class="nes-input is-dark text-xs w-full" required placeholder="••••••••" />
+          </div>
+          <button type="submit" class="nes-btn is-primary w-full mt-4">PRESS START</button>
+        </form>
+
+        <!-- Signup Form -->
+        <form id="signup-form" class="space-y-4 text-xs hidden">
+          <div>
+            <label class="block mb-2 text-gray-300">USERNAME</label>
+            <input type="text" id="signup-username" class="nes-input is-dark text-xs w-full" required placeholder="retro_gamer" />
+          </div>
+          <div>
+            <label class="block mb-2 text-gray-300">EMAIL</label>
+            <input type="email" id="signup-email" class="nes-input is-dark text-xs w-full" required placeholder="player@arcade.com" />
+          </div>
+          <div>
+            <label class="block mb-2 text-gray-300">PASSWORD</label>
+            <input type="password" id="signup-password" class="nes-input is-dark text-xs w-full" required placeholder="••••••••" />
+          </div>
+          <button type="submit" class="nes-btn is-success w-full mt-4">CREATE PLAYER</button>
+        </form>
+
+      </div>
+    </section>
+
+    <!-- ==================== DASHBOARD VIEW ==================== -->
+    <section id="dashboard-view" class="hidden space-y-8">
+
+      <!-- DASHBOARD SUMMARY CARDS -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+        <div class="nes-container is-dark p-3 text-center border-yellow-500">
+          <p class="text-gray-400 mb-1">ACTIVE HABITS</p>
+          <p id="stat-total-habits" class="text-xl text-yellow-400 font-bold">0</p>
+        </div>
+        <div class="nes-container is-dark p-3 text-center border-green-500">
+          <p class="text-gray-400 mb-1">DONE TODAY</p>
+          <p id="stat-done-today" class="text-xl text-green-400 font-bold">0</p>
+        </div>
+        <div class="nes-container is-dark p-3 text-center border-red-500">
+          <p class="text-gray-400 mb-1">BEST STREAK</p>
+          <p id="stat-best-streak" class="text-xl text-red-400 font-bold">0 🔥</p>
+        </div>
+        <div class="nes-container is-dark p-3 text-center border-blue-500">
+          <p class="text-gray-400 mb-1">TOTAL XP</p>
+          <p id="stat-total-xp" class="text-xl text-blue-400 font-bold">0</p>
+        </div>
+      </div>
+
+      <!-- HABITS CONTROLS BAR -->
+      <div class="nes-container is-dark p-4 flex flex-wrap justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+          <button id="add-habit-btn" class="nes-btn is-success text-xs flex items-center gap-2">
+            <span>+</span> NEW HABIT
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs">
+          <span class="text-gray-400">CATEGORY:</span>
+          <div class="nes-select is-dark w-40 text-xs">
+            <select id="category-filter">
+              <option value="ALL">ALL</option>
+              <option value="Health">Health</option>
+              <option value="Coding">Coding</option>
+              <option value="Fitness">Fitness</option>
+              <option value="Mindset">Mindset</option>
+              <option value="General">General</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- HABITS LIST -->
+      <div class="nes-container is-dark with-title">
+        <p class="title text-yellow-400">TODAY'S QUESTS</p>
+
+        <div id="habit-list" class="space-y-4 mt-2">
+          <!-- Habit cards rendered dynamically -->
+        </div>
+
+        <div id="empty-habits-msg" class="hidden text-center py-8 text-gray-500 text-xs">
+          <p class="mb-2">NO QUESTS ACTIVE!</p>
+          <p class="text-gray-600">Click "+ NEW HABIT" above to begin your adventure.</p>
+        </div>
+      </div>
+
+      <!-- 365-DAY HEATMAP MATRIX -->
+      <div class="nes-container is-dark with-title">
+        <p class="title text-yellow-400">ACTIVITY HEATMAP (365 DAYS)</p>
+        <p class="text-gray-400 text-xs mb-4">Click any cell to inspect past logs and daily quest completions.</p>
+
+        <!-- Grid Container -->
+        <div id="heatmap-grid" class="heatmap-grid py-2">
+          <!-- Cells injected by JS -->
+        </div>
+
+        <!-- Legend -->
+        <div class="flex items-center justify-end gap-2 text-[10px] mt-3 text-gray-400">
+          <span>LESS</span>
+          <span class="heatmap-cell level-0 inline-block"></span>
+          <span class="heatmap-cell level-1 inline-block"></span>
+          <span class="heatmap-cell level-2 inline-block"></span>
+          <span class="heatmap-cell level-3 inline-block"></span>
+          <span class="heatmap-cell level-4 inline-block"></span>
+          <span>MORE</span>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- ADD / EDIT HABIT MODAL -->
+  <div id="habit-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden px-4">
+    <div class="nes-container is-dark with-title max-w-md w-full">
+      <p id="habit-modal-title" class="title text-yellow-400">NEW QUEST</p>
+
+      <form id="habit-form" class="space-y-4 text-xs">
+        <input type="hidden" id="habit-id" value="" />
+
+        <div>
+          <label class="block mb-2 text-gray-300">QUEST TITLE</label>
+          <input type="text" id="habit-title-input" class="nes-input is-dark text-xs w-full" required placeholder="e.g. 30 Mins Coding" />
+        </div>
+
+        <div>
+          <label class="block mb-2 text-gray-300">CATEGORY</label>
+          <div class="nes-select is-dark w-full text-xs">
+            <select id="habit-category-input">
+              <option value="General">General</option>
+              <option value="Health">Health</option>
+              <option value="Coding">Coding</option>
+              <option value="Fitness">Fitness</option>
+              <option value="Mindset">Mindset</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 mt-6">
+          <button type="button" id="close-habit-modal" class="nes-btn is-normal text-xs">CANCEL</button>
+          <button type="submit" class="nes-btn is-success text-xs">SAVE QUEST</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- HISTORICAL DAY STATS MODAL -->
+  <div id="date-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden px-4">
+    <div class="nes-container is-dark with-title max-w-lg w-full">
+      <p id="date-modal-title" class="title text-yellow-400">DATE STATS</p>
+
+      <div class="text-xs space-y-4">
+        <div class="flex justify-between border-b border-gray-700 pb-2">
+          <span class="text-gray-400">COMPLETION RATE:</span>
+          <span id="date-modal-rate" class="text-green-400 font-bold">0%</span>
+        </div>
+
+        <div id="date-modal-habits-list" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+          <!-- Historical habit logs loaded here -->
+        </div>
+
+        <div class="flex justify-end mt-4">
+          <button id="close-date-modal" class="nes-btn is-primary text-xs">CLOSE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VICTORY / STAGE CLEARED POP-UP MODAL -->
+  <div id="victory-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden px-4">
+    <div class="nes-container is-dark victory-card max-w-md w-full text-center p-6 border-yellow-400">
+      <div class="mb-4">
+        <i class="nes-icon trophy is-large"></i>
+      </div>
+      <h2 class="text-2xl text-yellow-400 font-bold tracking-widest mb-2">STAGE CLEARED!</h2>
+      <p class="text-gray-300 text-xs mb-6">ALL QUESTS COMPLETED FOR TODAY!</p>
+
+      <div class="bg-gray-800 p-4 border-2 border-yellow-500 mb-6 space-y-3 text-xs">
+        <p class="text-green-400 font-bold">✨ +50 XP PERFECT BONUS</p>
+        <p class="text-yellow-300 font-bold">🪙 +10 EXTRA COINS</p>
+      </div>
+
+      <button id="close-victory-modal" class="nes-btn is-warning text-xs px-6 py-2">CONTINUE PLAYING</button>
+    </div>
+  </div>
+
+  <!-- App Logic -->
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
